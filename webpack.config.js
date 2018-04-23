@@ -5,13 +5,21 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const OptimizeCSSAssets = require('optimize-css-assets-webpack-plugin');
 
 let config = {
-  entry: './src/index.js',
+  entry: './src/index.tsx',
   output: {
     path: path.resolve(__dirname, './public'),
-    filename: 'output.js'
+    filename: 'bundle.js'
+  },
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js']
   },
   module: {
     rules: [
+      // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
+      { test: /\.tsx?$/, loader: 'awesome-typescript-loader' },
+
+      // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
+      { enforce: 'pre', test: /\.js$/, loader: 'source-map-loader' },
       {
         test: /\.(js|jsx)$/, // files ending with .js
         exclude: /node_modules/, // exclude the node_modules directory
@@ -52,6 +60,10 @@ let config = {
         include: __dirname
       }
     ]
+  },
+  externals: {
+    react: 'React',
+    'react-dom': 'ReactDOM'
   },
   plugins: [new ExtractTextWebpackPlugin('styles.css')],
   devServer: {
